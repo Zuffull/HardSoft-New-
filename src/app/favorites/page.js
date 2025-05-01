@@ -1,19 +1,16 @@
-import './page.css';
+import './favoritespage.css';
 import Link from 'next/link';
 
-export default function Home() {
-  return (
-    <div className='Header'>
+export default function FavoritesPage() {
+    return (
+      <div className='Header'>
         <div className='header_line'>
           <div className='header_logo'>
             <img src='Logo.png' alt='Logo' />
           </div>
           <h1 className='Logo_name'>HardSoft</h1>
             <div className='adresa'>Україна, м. <br/>Шептицький</div>
-            <div className="image-container">
-            <img src="Rectangle 1.png" alt="Background" className="background-image" />
-            <p className="overlay-text">вул. Стуса буд. 3</p>
-            </div>
+          <p className='Street'>вул. Стуса буд. 3</p>
           <p className='Street'>Пн.-Пт. з 09:00 до 19:00 <br/>Сб. з 10:00 до 18:00 </p>
           <div className='button'>
           <Link href='#'>
@@ -28,5 +25,5 @@ export default function Home() {
           </div>
         </div>
       </div>
-  );
-}
+    );
+  }
