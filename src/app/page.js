@@ -3,6 +3,7 @@ import Categories from '../components/Categories';
 import ProductCard from '../components/ProductCard';
 import ConfiguratorSection from '../components/ConfiguratorSection';
 import ProductCard2 from '../components/ProductCard2';
+import Footer from '../components/Footer';
 import '../styles/StyleMainpage.css';
 import React from 'react';
 
@@ -30,6 +31,7 @@ export default function Home() {
         </p>
         </div>
       </main>
+      <Footer />
     </div>
   );
 };
