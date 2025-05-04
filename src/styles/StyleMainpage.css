@@ -1,0 +1,33 @@
+.Main{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 70px;
+    margin-left: 100px;
+}
+.Text {
+    width: 1435px;
+    height: 420px;
+    position: relative;
+    font-family: 'Anonymous Pro', sans-serif;
+    font-size: 25px;
+    color: #ffffff;
+    text-align: left;
+    z-index: 2; /* Текст буде поверх BlurCircle */
+}
+
+.BlurCircle {
+    width: 300px;
+    height: 300px;
+    position: absolute;
+    border-radius: 50%;
+    background: #FF8001;
+    filter: blur(200px);
+    z-index: 1;
+    left: 450px;
+    top: 40px;
+}
+.highlight {
+  color: #ff8001; /* Помаранчевий колір */
+  font-weight: bold; /* Жирний текст (опціонально) */
+}
