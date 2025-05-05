@@ -1,0 +1,197 @@
+/* Контейнер для фільтрів і товарів */
+.filters-and-products {
+    display: flex;
+    align-items: flex-start; /* Вирівнюємо елементи по верхньому краю */
+    gap: 20px;
+    padding: 20px;
+    margin-top: 40px;
+
+}
+
+/* Фільтри */
+.filters {
+    background-color: #f5f5f5;
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+    max-width: 250px;
+    height: auto; /* Висота залежить від вмісту */
+    position: sticky; /* Фіксуємо фільтр */
+    align-self: flex-start; /* Забезпечує незалежність висоти */
+    
+}
+
+  
+  .filter-category {
+    margin-bottom: 20px;
+  }
+  
+  .filter-category h3 {
+    font-size: 18px;
+    margin-bottom: 8px;
+    color: #333;
+  }
+  
+  .filter-category label {
+    display: block;
+    margin: 4px 0;
+    font-size: 14px;
+  }
+  
+  .price-inputs {
+    display: flex;
+    gap: 8px;
+  }
+  
+  .price-inputs input {
+    width: 100%;
+    padding: 6px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+  }
+  
+  .filter-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  
+  .apply-button,
+  .reset-button {
+    padding: 8px 12px;
+    font-size: 14px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .apply-button {
+    background-color: #6A00A7;
+    color: white;
+  }
+  
+  .reset-button {
+    background-color: #e0e0e0;
+  }
+  
+  .apply-button:hover {
+    background-color: #1565c0;
+  }
+  
+  .reset-button:hover {
+    background-color: #bdbdbd;
+  }
+  
+  /* ======== Товари ======== */
+  
+/* Товари */
+.systemproduct-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 20px;
+}
+  
+  .systemproduct-card {
+    background-color: #ffffff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .systemproduct-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .systemproduct-card img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+  }
+  
+  .systemproduct-info {
+    padding: 16px;
+  }
+  
+  .systemproduct-title {
+    font-size: 16px;
+    margin: 0 0 8px;
+  }
+  
+  .systemproduct-specs {
+    font-size: 14px;
+    padding: 0;
+    margin: 8px 0;
+    list-style: none;
+  }
+  
+  .systemproduct-specs li {
+    margin-bottom: 4px;
+  }
+  
+  .systemproduct-price {
+    font-weight: bold;
+    font-size: 16px;
+    margin-top: 10px;
+    color: #2e7d32;
+  }
+  
+  .systemproduct-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 12px;
+  }
+  
+  .systemproduct-button {
+    background-color: #FF8001;
+    color: white;
+    text-decoration: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+  }
+  
+  .systemproduct-button:hover {
+    background-color: #388e3c;
+  }
+  
+  .favorite-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .favorite-btn img {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .pagination {
+    margin-top: 20px;
+    text-align: center;
+  }
+  
+  .pagination button {
+    margin: 0 5px;
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    background: #fff;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  
+  .pagination button:hover {
+    background: #f0f0f0;
+  }
+  
+  .pagination button.active {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+  }
+  
