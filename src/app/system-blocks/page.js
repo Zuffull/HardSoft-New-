@@ -1,9 +1,9 @@
 'use client';
 import React, { useState } from 'react';
-import Header from '@/components/Header';
-import Categories from '@/components/Categories';
-import Footer from '@/components/Footer';
-import '@/styles/Filters.css';
+import Header from '../../components/Header.js';
+import Categories from '../../components/Categories.js';
+import Footer from '../../components/Footer.js';
+import '../../styles/Filters.css';
 
 function SystemProductCard({ product }) {
   return (
