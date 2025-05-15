@@ -70,6 +70,7 @@ export async function fetch324Products({
     })
   );
 
+  console.log(productsWithDetails);
   return productsWithDetails;
 }
   

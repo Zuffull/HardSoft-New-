@@ -6,6 +6,7 @@ import Footer from '../../components/Footer.js';
 import { fetchAllCategories, fetch324Products, fetchCategoryByName } from '../../api/productApi.js';
 import { fetchCategoryAttributes, fetchAttributeValues } from '../../api/systemblocksApi.js';
 import { ProductCardItem } from '../../components/ProductCard.js';
+import SimpleProductCard from '../../components/SimpleProductCard.js';
 import '../../styles/Peripherals.css';
 
 const PERIPHERAL_CATEGORIES = [
@@ -32,6 +33,7 @@ export default function PeripheralsPage() {
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [allProducts, setAllProducts] = useState([]);
 
   // Завантажити всі категорії та знайти потрібні
   useEffect(() => {
@@ -65,26 +67,37 @@ export default function PeripheralsPage() {
     }).finally(() => setLoading(false));
   }, [selectedCategory]);
 
-  // Завантажити товари при зміні категорії, фільтрів або сторінки
+  // Завантажити всі товари для категорії (без фільтрів)
   useEffect(() => {
     if (!selectedCategory) return;
     setLoading(true);
-    let filter = {};
-    Object.entries(selectedFilters).forEach(([attrId, value]) => {
-      if (value) filter[attrId] = value;
-    });
     fetch324Products({
       categoryName: selectedCategory.name,
-      filter,
-      limit: 16,
-      page,
+      limit: 1000, // завантажити максимум товарів
+      page: 1,
     })
       .then(data => {
+        setAllProducts(data);
         setProducts(data);
         setTotalPages(Math.ceil((data.length ? data[0].totalCount || 100 : 100) / 16));
       })
       .finally(() => setLoading(false));
-  }, [selectedCategory, selectedFilters, page]);
+  }, [selectedCategory]);
+
+  // Фільтрація на фронті
+  useEffect(() => {
+    if (!allProducts.length) return;
+    let filtered = allProducts.filter(product => {
+      return filters.every(attr => {
+        const value = selectedFilters[attr.id];
+        if (!value) return true;
+        return product.attributes?.[attr.name] === value;
+      });
+    });
+    setProducts(filtered);
+    setTotalPages(Math.ceil((filtered.length ? filtered[0]?.totalCount || filtered.length : 1) / 16));
+    setPage(1);
+  }, [selectedFilters, allProducts, filters]);
 
   const handleCategoryClick = (cat) => {
     setSelectedCategory(cat);
@@ -153,7 +166,7 @@ export default function PeripheralsPage() {
               <div className="product-grid">
                 {products.length === 0 && <div>Товарів не знайдено</div>}
                 {products.map(product => (
-                  <ProductCardItem key={product.id} product={product} />
+                  <SimpleProductCard key={product.id} product={product} category={selectedCategory?.name} />
                 ))}
               </div>
             )}
