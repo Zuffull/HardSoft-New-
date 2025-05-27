@@ -1,177 +1,136 @@
-'use client';
 import React, { useState } from 'react';
 import '../styles/AuthModal.css';
+import { login, register } from '../api/accountApi';
 
 export default function AuthModal({ onClose, setIsAuthenticated }) {
   const [isLogin, setIsLogin] = useState(true);
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    phoneNumber: '',
-    email: '',
-    password: '',
-  });
-  const [error, setError] = useState('');
+  const [form, setForm] = useState({ username: '', password: '', email: '', phone: '' });
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const toggleAuthMode = () => {
-    setIsLogin(!isLogin);
-    setError('');
-    setFormData({ firstName: '', lastName: '', phoneNumber: '', email: '', password: '' });
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
-
-    const endpoint = isLogin ? '/api/login' : '/api/register';
-    const data = isLogin
-      ? { email: formData.email, password: formData.password }
-      : {
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          phoneNumber: formData.phoneNumber,
-          email: formData.email,
-          password: formData.password,
-        };
-
     try {
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (response.ok) {
-        const responseData = await response.json();
-        // Збереження даних користувача в localStorage (або куки)
-        localStorage.setItem('user', JSON.stringify(responseData.user));
-
-        // Оновлюємо стан автентифікації на сторінці
+      if (isLogin) {
+        const response = await login({ username: form.username, password: form.password });
+        console.log('Login response:', response);
+        if (response.token) {
+          localStorage.setItem('token', response.token);
+        } else {
+          console.warn('Token not found in login response');
+        }
         setIsAuthenticated(true);
         onClose();
-        alert(isLogin ? 'Успішно увійшли!' : 'Успішно зареєстровано!');
       } else {
-        throw new Error('Помилка при ' + (isLogin ? 'вході' : 'реєстрації') + '. Перевірте введені дані!');
+        const response = await register({ username: form.username, email: form.email, password: form.password, phone: form.phone });
+        console.log('Register response:', response);
+        if (response.token) {
+          localStorage.setItem('token', response.token);
+        } else {
+          console.warn('Token not found in register response');
+        }
+        setIsAuthenticated(true);
+        onClose();
       }
-    } catch (error) {
-      setError(error.message);
+    } catch (err) {
+      console.error('Auth error:', err);
+      setError(err.message || 'Сталася помилка. Спробуйте ще раз.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="auth-modal-overlay" onClick={onClose}>
-      <div className="auth-modal" onClick={(e) => e.stopPropagation()}>
+    <div className="auth-modal-overlay">
+      <div className="auth-modal">
         <div className="auth-modal-header">
-          <button className="close-btn" onClick={onClose}>X</button>
+          <button className="close-btn" onClick={onClose}>&times;</button>
         </div>
         <div className="auth-modal-body">
           <h2>{isLogin ? 'Вхід' : 'Реєстрація'}</h2>
-          <form className="auth-form" onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label htmlFor="username">Логін</label>
+              <input
+                type="text"
+                id="username"
+                name="username"
+                value={form.username}
+                onChange={handleChange}
+                required
+                autoComplete="username"
+              />
+            </div>
             {!isLogin && (
               <>
                 <div className="form-group">
-                  <label htmlFor="firstName">Ім'я:</label>
+                  <label htmlFor="email">Email</label>
                   <input
-                    type="text"
-                    id="firstName"
-                    name="firstName"
-                    placeholder="Введіть ім'я"
-                    required
-                    value={formData.firstName}
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={form.email}
                     onChange={handleChange}
+                    required
+                    autoComplete="email"
                   />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="lastName">Прізвище:</label>
-                  <input
-                    type="text"
-                    id="lastName"
-                    name="lastName"
-                    placeholder="Введіть прізвище"
-                    required
-                    value={formData.lastName}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="phoneNumber">Номер телефону:</label>
+                  <label htmlFor="phone">Телефон</label>
                   <input
                     type="tel"
-                    id="phoneNumber"
-                    name="phoneNumber"
-                    placeholder="Введіть номер телефону"
-                    required
-                    value={formData.phoneNumber}
+                    id="phone"
+                    name="phone"
+                    value={form.phone}
                     onChange={handleChange}
+                    required
+                    autoComplete="tel"
                   />
                 </div>
               </>
             )}
             <div className="form-group">
-              <label htmlFor="email">Email:</label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                placeholder="Введіть email"
-                required
-                value={formData.email}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="password">Пароль:</label>
+              <label htmlFor="password">Пароль</label>
               <input
                 type="password"
                 id="password"
                 name="password"
-                placeholder="Введіть пароль"
-                required
-                value={formData.password}
+                value={form.password}
                 onChange={handleChange}
+                required
+                autoComplete={isLogin ? 'current-password' : 'new-password'}
               />
             </div>
-            <button type="submit" className="auth-submit-btn" disabled={loading}>
+            {error && <div style={{ color: 'red', marginBottom: 10 }}>{error}</div>}
+            <button className="auth-submit-btn" type="submit" disabled={loading}>
               {loading ? 'Зачекайте...' : isLogin ? 'Увійти' : 'Зареєструватися'}
             </button>
           </form>
-
-          {error && <p className="error-message">{error}</p>}
-
-          {isLogin ? (
-            <div className="auth-toggle">
-              <span>Немає акаунту?</span>
-              <button onClick={toggleAuthMode} className="toggle-btn">
-                Зареєструватися
-              </button>
-              <div className="forgot-password">
-                <a href="/forgot-password">Забули пароль?</a>
-              </div>
-            </div>
-          ) : (
-            <div className="auth-toggle">
-              <span>Вже є акаунт?</span>
-              <button onClick={toggleAuthMode} className="toggle-btn">
-                Вхід
-              </button>
-            </div>
-          )}
+          <div className="auth-toggle">
+            {isLogin ? (
+              <>
+                Немає акаунта?{' '}
+                <button className="toggle-btn" onClick={() => setIsLogin(false)} type="button">
+                  Зареєструватися
+                </button>
+              </>
+            ) : (
+              <>
+                Вже є акаунт?{' '}
+                <button className="toggle-btn" onClick={() => setIsLogin(true)} type="button">
+                  Увійти
+                </button>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </div>
   );
-}
+} 

@@ -3,10 +3,11 @@ import React, { useEffect, useState } from 'react';
 import Header from '../../components/Header.js';
 import Categories from '../../components/Categories.js';
 import Footer from '../../components/Footer.js';
-import { ProductCardItem } from '../../components/ProductCard.js';
+import { ProductCardItem } from '../../components/ProductCards.js';
 import '../../styles/Filters.css';
-import { fetch324Products, fetchCategoryByName } from '../../api/productApi.js';
-import { fetchCategoryAttributes, fetchAttributeValues } from '../../api/systemblocksApi.js';
+import { filterProducts, fetchCategoryByName, fetchCategoryAttributes, fetchAttributeValues } from '../../api/productApiV2.js';
+import ProductDetailsModal from '../../components/ProductDetailsModal';
+
 
 const CATEGORY_NAME = 'Готові ПК';
 
@@ -16,7 +17,7 @@ const FILTER_ATTRS = [
   'Відеокарта',
   'Материнська плата',
   "Тип пам'яті",
-  "Оперативна пам'ять",
+  'Оперативна пам’ять',
   'Накопичувач SSD',
   'Накопичувач HDD',
   'SSD m.2',
@@ -33,83 +34,122 @@ export default function SystemBlocksPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [priceMin, setPriceMin] = useState('');
   const [priceMax, setPriceMax] = useState('');
-  const [categoryId, setCategoryId] = useState(null);
+  const [category, setCategory] = useState(null);
   // Draft стани для фільтрів
   const [draftSelectedFilters, setDraftSelectedFilters] = useState({});
   const [draftPriceMin, setDraftPriceMin] = useState('');
   const [draftPriceMax, setDraftPriceMax] = useState('');
+  const [allProducts, setAllProducts] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
-  // Завантаження id категорії по назві
+  // Завантаження категорії по назві
   useEffect(() => {
-    async function loadCategoryId() {
+    async function loadCategory() {
       try {
-        const category = await fetchCategoryByName(CATEGORY_NAME);
-        if (category) setCategoryId(category.id);
+        const cat = await fetchCategoryByName(CATEGORY_NAME);
+        if (cat) setCategory(cat);
       } catch (e) { console.error(e); }
     }
-    loadCategoryId();
+    loadCategory();
   }, []);
 
   // Завантаження атрибутів категорії
   useEffect(() => {
     async function loadAttributes() {
-      if (!categoryId) return;
+      if (!category?.id) return;
       try {
-        const attrs = await fetchCategoryAttributes(categoryId);
+        const attrs = await fetchCategoryAttributes(category.id);
         setAttributes(attrs.filter(a => FILTER_ATTRS.includes(a.name)));
       } catch (e) { console.error(e); }
     }
     loadAttributes();
-  }, [categoryId]);
+  }, [category]);
 
   // Завантаження значень для кожного атрибута
   useEffect(() => {
     async function loadValues() {
-      if (!categoryId) return;
+      if (!category?.id) return;
       const valuesObj = {};
       for (const attr of attributes) {
         try {
-          valuesObj[attr.id] = await fetchAttributeValues(categoryId, attr.id);
+          valuesObj[attr.id] = await fetchAttributeValues(category.id, attr.id);
         } catch (e) { valuesObj[attr.id] = []; }
       }
       setAttrValues(valuesObj);
     }
-    if (attributes.length && categoryId) loadValues();
-  }, [attributes, categoryId]);
+    if (attributes.length && category?.id) loadValues();
+  }, [attributes, category]);
 
-  // Завантаження товарів з фільтрами
+  // Завантаження всіх товарів для категорії (без фільтрів)
   useEffect(() => {
-    async function loadProducts() {
-      if (!categoryId) return;
-      setLoading(true);
-      try {
-        const attributesFilter = Object.entries(selectedFilters)
-          .filter(([k, v]) => v && v.length)
-          .map(([attributeId, value]) => ({ attributeId, value }));
-        const filterObj = {};
-        if (attributesFilter.length) filterObj.attributes = attributesFilter;
-        if (priceMin) filterObj.priceMin = Number(priceMin);
-        if (priceMax) filterObj.priceMax = Number(priceMax);
-        // Логування filterObj перед запитом
-        console.log('filterObj для fetch324Products:', filterObj);
-        const data = await fetch324Products({
-          page,
-          limit: 16,
-          categoryName: CATEGORY_NAME,
-          filter: filterObj,
-        });
-        setProducts(data);
-        setTotalPages(Math.ceil((data.length ? data[0].totalCount || 100 : 100) / 16));
-      } catch (e) {
+    if (!category?.id) return;
+    setLoading(true);
+    console.log('Loading products for category:', category.id);
+    filterProducts({
+      category: category.id,
+      limit: 1000,
+      page: 1,
+    })
+      .then(data => {
+        console.log('Received products:', data);
+        if (Array.isArray(data.products)) {
+          setAllProducts(data.products);
+          setProducts(data.products.slice(0, 16));
+          setTotalPages(Math.ceil(data.products.length / 16));
+        } else if (Array.isArray(data)) {
+          setAllProducts(data);
+          setProducts(data.slice(0, 16));
+          setTotalPages(Math.ceil(data.length / 16));
+        } else {
+          console.error('Unexpected data format:', data);
+          setAllProducts([]);
+          setProducts([]);
+          setTotalPages(1);
+        }
+      })
+      .catch(error => {
+        console.error('Error loading products:', error);
+        setAllProducts([]);
         setProducts([]);
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadProducts();
-  }, [selectedFilters, page, priceMin, priceMax, categoryId]);
+        setTotalPages(1);
+      })
+      .finally(() => setLoading(false));
+  }, [category]);
 
-  // Зміна фільтра (оновлює лише драфтовий стан)
+  // Фільтрація через API
+  useEffect(() => {
+    if (!category?.id) return;
+    setLoading(true);
+
+    // Формуємо фільтр по атрибутах тільки з непорожніми значеннями
+    let attributeFilters = {};
+    attributes.forEach(attr => {
+      const value = selectedFilters[attr.id];
+      if (value) attributeFilters[attr.id] = value;
+    });
+
+    filterProducts({
+      category: category.id,
+      page,
+      limit: 16,
+      minPrice: priceMin || undefined,
+      maxPrice: priceMax || undefined,
+      attributeFilters,
+    })
+      .then(data => {
+        const products = Array.isArray(data.products) ? data.products : Array.isArray(data) ? data : [];
+        setProducts(products);
+        setTotalPages(Math.ceil((data.totalCount || products.length || 1) / 16));
+      })
+      .catch(error => {
+        console.error('Error filtering products:', error);
+        setProducts([]);
+        setTotalPages(1);
+      })
+      .finally(() => setLoading(false));
+  }, [selectedFilters, attributes, priceMin, priceMax, page, category]);
+
+  // Зміна фільтра (оновлює лише драфтові стани)
   const handleDraftFilterChange = (attrId, value) => {
     setDraftSelectedFilters((prev) => ({ ...prev, [attrId]: value }));
   };
@@ -127,10 +167,6 @@ export default function SystemBlocksPage() {
 
   // Застосування фільтрів
   const handleApply = () => {
-    // Логування значень фільтрів
-    console.log('Застосовані фільтри:', draftSelectedFilters);
-    console.log('Мінімальна ціна:', draftPriceMin);
-    console.log('Максимальна ціна:', draftPriceMax);
     setSelectedFilters(draftSelectedFilters);
     setPriceMin(draftPriceMin);
     setPriceMax(draftPriceMax);
@@ -197,19 +233,43 @@ export default function SystemBlocksPage() {
           ) : (
             <>
               <div className="systemproduct-grid">
-                {products.length ? products.map(product => (
-                  <ProductCardItem product={product} key={product.id} />
-                )) : <div>Товарів не знайдено</div>}
+                {console.log('Rendering products:', products)}
+                {products && products.length > 0 ? products.map(product => {
+                  console.log('Rendering product:', product);
+                  return (
+                    <ProductCardItem 
+                      product={product} 
+                      key={product.id} 
+                      onClick={() => setSelectedProduct(product)}
+                    />
+                  );
+                }) : (
+                  <div style={{ 
+                    width: '100%', 
+                    textAlign: 'center', 
+                    padding: '20px',
+                    fontSize: '18px'
+                  }}>
+                    Товарів не знайдено
+                  </div>
+                )}
               </div>
-              <div className="pagination">
-                {Array.from({ length: totalPages }, (_, i) => (
-                  <button
-                    key={i}
-                    className={i + 1 === page ? 'active' : ''}
-                    onClick={() => setPage(i + 1)}
-                  >{i + 1}</button>
-                ))}
-              </div>
+              {products && products.length > 0 && (
+                <div className="pagination">
+                  {Array.from({ length: totalPages }, (_, i) => (
+                    <button
+                      key={i}
+                      className={i + 1 === page ? 'active' : ''}
+                      onClick={() => setPage(i + 1)}
+                    >
+                      {i + 1}
+                    </button>
+                  ))}
+                </div>
+              )}
+              {selectedProduct && (
+                <ProductDetailsModal product={selectedProduct} onClose={() => setSelectedProduct(null)} />
+              )}
             </>
           )}
         </main>
