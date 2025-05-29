@@ -103,8 +103,8 @@ export default function ProfilePage() {
   };
 
   if (loading) return <div><Header /><div style={{padding:32}}>Завантаження...</div></div>;
-  if (error) return <div><Header /><div style={{padding:32, color:'red'}}>{error}</div></div>;
-  if (!profile) return <div><Header /><div style={{padding:32}}>Профіль не знайдено</div></div>;
+  if (error) return <div><Header /><div style={{padding:32, color:'red'}}>{error}<br/><button onClick={() => { localStorage.removeItem('token'); router.push('/'); }} style={{marginTop:16, background:'#ff8001', color:'#fff', border:'none', borderRadius:10, padding:'12px 24px', fontWeight:700, fontSize:16, cursor:'pointer'}}>Вийти з акаунту</button></div></div>;
+  if (!profile) return <div><Header /><div style={{padding:32}}>Профіль не знайдено<br/><button onClick={() => { localStorage.removeItem('token'); router.push('/'); }} style={{marginTop:16, background:'#ff8001', color:'#fff', border:'none', borderRadius:10, padding:'12px 24px', fontWeight:700, fontSize:16, cursor:'pointer'}}>Вийти з акаунту</button></div></div>;
 
   return (
     <div style={{ }}>

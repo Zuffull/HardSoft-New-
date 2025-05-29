@@ -14,10 +14,10 @@ export default function ContactsPage() {
         <div className="contacts-container">
           <h1 className="contacts-title">Контакти</h1>
           <div className="contacts-info">
-            <p><b>Телефон:</b> <a href="tel:+380991234567">+38 (099) 123-45-67</a></p>
+            <p><b>Телефон:</b> <a href="tel:+380991234567">+38 (068) 401-431-08</a></p>
             <p><b>Email:</b> <a href="mailto:info@hardsoft.ua">info@hardsoft.ua</a></p>
-            <p><b>Адреса:</b> м. Київ, вул. Прикладна, 1</p>
-            <p><b>Графік роботи:</b> Пн-Пт 10:00-19:00, Сб-Нд 11:00-17:00</p>
+            <p><b>Адреса:</b> м. Шептицький, вул. Стуса, 3</p>
+            <p><b>Графік роботи:</b> Пн-Пт 9:00-19:00, Сб-Нд 10:00-18:00</p>
             <p><b>Ми у соцмережах:</b></p>
             <ul className="contacts-socials">
               <li><a href="https://facebook.com/yourpage" target="_blank" rel="noopener noreferrer"><span className="contacts-icon">📘</span> Facebook</a></li>
