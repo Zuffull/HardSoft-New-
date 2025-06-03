@@ -215,7 +215,7 @@
 }
 
 .configurator-button {
-  background-color: #1a1a1a;
+  background-color: #121212;
   color: #fff;
   border: none;
   padding: 10px 20px;
@@ -229,7 +229,7 @@
 }
 
 .configurator-button:hover:not(:disabled) {
-  background-color: #2d2d2d;
+  background-color: #1a1a1a;
   transform: translateY(-1px);
 }
 
@@ -238,27 +238,37 @@
 }
 
 .configurator-button:disabled {
-  background-color: #1a1a1a;
+  background-color: #121212;
   opacity: 0.5;
   cursor: not-allowed;
 }
 
 .configurator-button.delete {
+  background-color: #2d1515;
   color: #ff4444;
 }
 
+.configurator-button.delete:hover:not(:disabled) {
+  background-color: #3d1515;
+}
+
 .configurator-button.buy {
-  background-color: #00a000;
+  background-color: #0a2a0a;
   color: #fff;
   padding: 12px 24px;
   font-size: 15px;
 }
 
 .configurator-button.buy:hover:not(:disabled) {
-  background-color: #00b800;
+  background-color: #0d3d0d;
 }
 
 .configurator-button.add {
   padding: 8px 16px;
   width: 100%;
+  background-color: #121212;
+}
+
+.configurator-button.add:hover:not(:disabled) {
+  background-color: #1a1a1a;
 }

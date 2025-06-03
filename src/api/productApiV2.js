@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://192.168.0.105:3000';
+const API_BASE_URL = 'http://104.244.79.23:3000';
 
 /**
  * Отримати токен авторизації з localStorage
@@ -311,8 +311,7 @@ export async function filterProducts(params = {}) {
 
   if (!res.ok) throw new Error('Не вдалося відфільтрувати товари');
   return res.json();
-} 
-
+}
 
 // Get category name
 
@@ -347,5 +346,39 @@ export async function getProductCategoryInfo(productId) {
   } catch (error) {
     console.error('Помилка в getProductCategoryInfo:', error);
     throw error;
+  }
+}
+
+/**
+ * Отримати ID категорії за її назвою
+ * @param {string} categoryName - Назва категорії
+ * @returns {Promise<string|null>} ID категорії або null
+ */
+export async function getCategoryIdByName(categoryName) {
+  try {
+    const categories = await fetchAllCategories();
+    const category = categories.find(cat => cat.name === categoryName);
+    return category ? category.id : null;
+  } catch (error) {
+    console.error('Помилка отримання ID категорії:', error);
+    return null;
+  }
+}
+
+/**
+ * Отримати підкатегорії за назвою батьківської категорії
+ * @param {string} parentCategoryName - Назва батьківської категорії
+ * @returns {Promise<Array>} Масив підкатегорій
+ */
+export async function getSubcategoriesByParentName(parentCategoryName) {
+  try {
+    const categories = await fetchAllCategories();
+    const parentCategory = categories.find(cat => cat.name === parentCategoryName);
+    if (!parentCategory) return [];
+    
+    return categories.filter(cat => cat.parent_id === parentCategory.id);
+  } catch (error) {
+    console.error('Помилка отримання підкатегорій:', error);
+    return [];
   }
 }

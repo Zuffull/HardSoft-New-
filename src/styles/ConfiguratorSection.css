@@ -40,7 +40,7 @@
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
-.configurator-button {
+.configurator-section-button {
     display: inline-block;
     padding: 12px 24px;
     background: linear-gradient(90deg, #6A00A7 0%, #290041 100%);
@@ -55,7 +55,7 @@
     margin-top: 3px;
 }
 
-.configurator-button:hover {
+.configurator-section-button:hover {
     transform: translateY(-3px);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 }
@@ -75,7 +75,7 @@
         font-size: 35px;
     }
 
-    .configurator-button {
+    .configurator-section-button {
         font-size: 18px;
     }
 }
@@ -89,7 +89,7 @@
         font-size: 28px;
     }
 
-    .configurator-button {
+    .configurator-section-button {
         font-size: 16px;
         padding: 10px 20px;
     }

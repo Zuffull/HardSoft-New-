@@ -3,13 +3,13 @@ import React, { useEffect, useState } from 'react';
 import Header from '../../components/Header.js';
 import Categories from '../../components/Categories.js';
 import Footer from '../../components/Footer.js';
-import { fetchAllCategories, fetchCategoryAttributes, fetchAttributeValues, filterProducts } from '../../api/productApiV2.js';
+import { fetchAllCategories, fetchCategoryAttributes, fetchAttributeValues, filterProducts, getSubcategoriesByParentName } from '../../api/productApiV2.js';
 import { ProductCardItem } from '../../components/ProductCards.js';
 import ProductDetailsModal from '../../components/ProductDetailsModal';
 import '../../styles/Filters.css';
 
-// ID головної категорії комплектуючих
-const COMPONENTS_CATEGORY_ID = 'a02319b0-0924-4aac-be21-365014a0af69';
+// Назва головної категорії комплектуючих
+const COMPONENTS_CATEGORY_NAME = 'Компоненти';
 
 export default function ComponentsPage() {
   const [allCategories, setAllCategories] = useState([]);
@@ -37,7 +37,7 @@ export default function ComponentsPage() {
         const cats = await fetchAllCategories();
         console.log('Всі категорії:', cats);
         setAllCategories(cats);
-        const subs = cats.filter(cat => cat.parent_id === COMPONENTS_CATEGORY_ID);
+        const subs = await getSubcategoriesByParentName(COMPONENTS_CATEGORY_NAME);
         console.log('Підкатегорії комплектуючих:', subs);
         setSubcategories(subs);
         if (subs.length > 0) setSelectedSubcategory(subs[0]);

@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://192.168.0.105:3000';
+const API_BASE_URL = 'http://104.244.79.23:3000';
 
 export function getToken() {
   console.log(localStorage.getItem('token'));
