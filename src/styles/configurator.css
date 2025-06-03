@@ -213,3 +213,52 @@
     margin-top: 18px;
   }
 }
+
+.configurator-button {
+  background-color: #1a1a1a;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.configurator-button:hover:not(:disabled) {
+  background-color: #2d2d2d;
+  transform: translateY(-1px);
+}
+
+.configurator-button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.configurator-button:disabled {
+  background-color: #1a1a1a;
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.configurator-button.delete {
+  color: #ff4444;
+}
+
+.configurator-button.buy {
+  background-color: #00a000;
+  color: #fff;
+  padding: 12px 24px;
+  font-size: 15px;
+}
+
+.configurator-button.buy:hover:not(:disabled) {
+  background-color: #00b800;
+}
+
+.configurator-button.add {
+  padding: 8px 16px;
+  width: 100%;
+}

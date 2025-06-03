@@ -13,6 +13,7 @@ export default function AuthModal({ onClose, setIsAuthenticated }) {
   };
 
   const handleSubmit = async (e) => {
+    console.log(123321);
     e.preventDefault();
     setLoading(true);
     setError('');
@@ -30,8 +31,8 @@ export default function AuthModal({ onClose, setIsAuthenticated }) {
       } else {
         const response = await register({ username: form.username, email: form.email, password: form.password, phone: form.phone });
         console.log('Register response:', response);
-        if (response.token) {
-          localStorage.setItem('token', response.token);
+        if (response.user.token) {
+          localStorage.setItem('token', response.user.token);
         } else {
           console.warn('Token not found in register response');
         }

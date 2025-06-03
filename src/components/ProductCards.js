@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import '../styles/ProductCard.css';
-import { fetchAllCategories, fetchProductDetails, filterProducts } from '../api/productApiV2.js';
+import { fetchAllCategories, fetchProductDetails, filterProducts, fetchProductSpecs } from '../api/productApiV2.js';
 import { isFavorite, getFavorites, toggleFavorite } from '../utils/favorites';
 import { addToCart } from '../api/cartApi';
 import ProductDetailsModal from './ProductDetailsModal';
@@ -426,15 +426,20 @@ export function SimpleProductCard({ product, category }) {
 // Product card item for system blocks and peripherals
 export function ProductCardItem({ product: initialProduct, category, onClick }) {
   const [product, setProduct] = useState(initialProduct);
+  const [isButtonClicked, setIsButtonClicked] = useState(false);
   const { cartMessage, handleToggleFavorite, handleAddToCart } = useProductCard();
 
   useEffect(() => {
     const fetchDetails = async () => {
       try {
-        const details = await fetchProductDetails(initialProduct.id);
+        const [details, productSpecs] = await Promise.all([
+          fetchProductDetails(initialProduct.id),
+          fetchProductSpecs(initialProduct.id)
+        ]);
         setProduct(prev => ({
           ...prev,
           ...details,
+          attributes: productSpecs,
           averageRating: calculateAverageRating(details.reviews || prev.reviews || [])
         }));
       } catch (error) {
@@ -445,6 +450,16 @@ export function ProductCardItem({ product: initialProduct, category, onClick }) 
   }, [initialProduct.id]);
 
   const specs = getSpecsByCategory(product, category || 'Готові ПК');
+
+  const handleBuyClick = async (e) => {
+    e.stopPropagation(); // Prevent card click event
+    setIsButtonClicked(true);
+    await handleAddToCart(product.id);
+    // Reset button state after animation
+    setTimeout(() => {
+      setIsButtonClicked(false);
+    }, 300);
+  };
 
   return (
     <div className="systemproduct-card" onClick={onClick} style={{cursor: 'pointer'}}>
@@ -476,25 +491,25 @@ export function ProductCardItem({ product: initialProduct, category, onClick }) 
           </div>
         </div>
         <ul className="systemproduct-specs">
-          {specs.map((spec, index) => (
+          {Object.entries(product.attributes || {}).slice(0, 6).map(([key, value], index) => (
             <li key={index}>
-              {spec.label}: {spec.value || "Не вказано"}
+              {key}: {value || "Не вказано"}
             </li>
           ))}
         </ul>
         <p className="systemproduct-price">{Number(product.price).toLocaleString('uk-UA')} ₴</p>
         <div className="systemproduct-actions">
           <button
-            className={`systemproduct-button${product.stock === 0 ? ' disabled' : ''}`}
+            className={`systemproduct-button${product.stock === 0 ? ' disabled' : ''}${isButtonClicked ? ' clicked' : ''}`}
             disabled={product.stock === 0}
-            onClick={() => handleAddToCart(product.id)}
+            onClick={handleBuyClick}
           >
             {product.stock === 0 ? 'Немає в наявності' : 'В кошик'}
           </button>
           <button
             className={`favorite-btn${isFavorite(product.id) ? ' active' : ''}`}
             title={isFavorite(product.id) ? 'Видалити з обраного' : 'Додати в обране'}
-            onClick={() => handleToggleFavorite(product.id)}
+            onClick={(e) => { e.stopPropagation(); handleToggleFavorite(product.id); }}
           >
             <img src={isFavorite(product.id) ? "/Обране(зірочка).png" : "/Обране(зірочка).png"} alt="favorite" />
           </button>

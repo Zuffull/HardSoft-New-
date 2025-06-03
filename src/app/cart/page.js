@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 import { getCart, addToCart, updateCart, clearCart } from '../../api/cartApi';
 import { fetchProductDetails } from '../../api/productApiV2';
 import Link from 'next/link';
+import { getConfigurationDetails } from '../../api/configuratorAPI';
 
 export default function Cart() {
   const [cartItems, setCartItems] = useState([]);
@@ -26,6 +27,37 @@ export default function Cart() {
         // Для кожного товару отримати повний продукт (ціна, фото, назва)
         const itemsWithDetails = await Promise.all(
           (data.cart.items || []).map(async (item) => {
+            if (item.product_id == null) {
+              try {
+                // Отримуємо деталі збірки
+                const buildDetails = await getConfigurationDetails(item.id);
+                console.log('BUILD DETAILS:', buildDetails);
+
+                return {
+                  ...item,
+                  product: {
+                    id: buildDetails.id,
+                    name: buildDetails.name || `Збірка #${buildDetails.id}`,
+                    image: '/pc-build.png',
+                    is_build: true,
+                    total_price: buildDetails.total_price,
+                    build_items: buildDetails.build_items || []
+                  }
+                };
+              } catch (error) {
+                console.error('Помилка отримання деталей збірки:', error);
+                return {
+                  ...item,
+                  product: {
+                    image: '/versum_corps-icon-98x98-40-40-40.png',
+                    price: 0,
+                    name: `Збірка #${item.id}`,
+                    is_build: true,
+                    total_price: item.total || 0
+                  }
+                };
+              }
+            }
             // Визначаємо productId з різних можливих полів, включаючи product_id
             const productId = item.product_id || item.product?.id || item.productId || item.id;
             try {
@@ -108,6 +140,12 @@ export default function Cart() {
   };
 
   const getItemPrice = (item) => {
+    console.log('ITEM:', item);
+    // Якщо це збірка
+    if (item.product?.is_build) {
+      return item.product.total_price || item.total || 0;
+    }
+    // Для звичайних товарів
     if (typeof item.price === 'number' && !isNaN(item.price)) return item.price;
     if (typeof item.product?.price === 'number' && !isNaN(item.product.price)) return item.product.price;
     if (typeof item.product?.price === 'string') return parseFloat(item.product.price) || 0;
@@ -149,6 +187,16 @@ export default function Cart() {
                     <img src={item.product.image} alt={item.product.name} className="cart-item-img" />
                     <div className="cart-item-info">
                       <div className="cart-item-title">{item.product.name}</div>
+                      {item.product.is_build && item.product.build_items && (
+                        <div className="cart-build-items">
+                          <div style={{fontSize: '0.9em', color: '#666', marginTop: '8px', marginBottom: '4px'}}>Компоненти збірки:</div>
+                          {item.product.build_items.map((buildItem, index) => (
+                            <div key={index} style={{fontSize: '0.85em', color: '#444', marginLeft: '12px'}}>
+                              • {buildItem.product?.name || 'Невідомий компонент'} - ₴{buildItem.product?.price || 0}
+                            </div>
+                          ))}
+                        </div>
+                      )}
                       <div className="cart-actions">
                         <button onClick={() => changeQuantity(item.id, item.quantity - 1)} className="cart-btn cart-btn-qty" disabled={item.quantity <= 1 || updatingItemId === item.id}>−</button>
                         <span className="cart-qty-value">{item.quantity}</span>

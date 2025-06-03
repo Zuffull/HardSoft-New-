@@ -33,11 +33,12 @@ export async function fetchCategoryProducts({
   const requestBody = {
     page: Number(page),
     limit: Number(limit),
-    filter,
+    category: categoryId,
+    attributeFilters: filter
   };
+  
   if (sort) requestBody.sort = sort;
   if (brand) requestBody.brand = brand;
-  if (categoryId) requestBody.category = categoryId;
 
   const res = await fetch(`${API_BASE_URL}/api/products/filter`, {
     method: 'POST',
@@ -132,12 +133,15 @@ export async function deleteConfiguration(buildId) {
 }
 
 // Додати компонент до конфігурації
-export async function addItemToConfiguration(buildId, { productId, quantity = 1 }) {
+export async function addItemToConfiguration(buildId, { productId}) {
   const res = await fetch(`${API_BASE_URL}/api/configurator/${buildId}/items`, {
     method: 'POST',
     headers: getAuthHeaders(),
-    body: JSON.stringify({ productId, quantity }),
+    body: JSON.stringify({ productId }),
   });
+  if (res.status === 500) {
+    return { error: (await res.json()) };
+  }
   if (!res.ok) throw new Error('Не вдалося додати компонент');
   return res.json();
 }

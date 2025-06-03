@@ -1,6 +1,6 @@
 const API_BASE_URL = 'http://192.168.0.105:3000';
 
-function getToken() {
+export function getToken() {
   console.log(localStorage.getItem('token'));
   return localStorage.getItem('token');
 }
@@ -36,7 +36,8 @@ export async function login({ username, password }) {
   });
   if (!res.ok) throw new Error(await res.text());
   const response = await res.json();
-  if (response.token) {
+    console.log(123);
+    if (response.token) {
     console.log(response.token);
     localStorage.setItem('token', response.token);
   }

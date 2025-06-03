@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Header from "../../components/Header";
-import { getProfile, updateProfile, getOrders } from "../../api/accountApi";
+import { getProfile, updateProfile, getOrders, getToken } from "../../api/accountApi";
 import { getUserConfigurations } from "../../api/configuratorAPI";
 import { useRouter } from "next/navigation";
 import Categories from "../../components/Categories";
@@ -23,6 +23,11 @@ export default function ProfilePage() {
   const [buildsError, setBuildsError] = useState("");
 
   useEffect(() => {
+
+    console.log(123);
+    console.log(getToken());
+    console.log(123);
+
     async function fetchProfile() {
       setLoading(true);
       setError("");

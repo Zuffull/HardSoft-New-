@@ -230,3 +230,36 @@
 .big-animated {
   animation: jump 1.2s infinite;
 }
+
+/* Animation for buy button click */
+@keyframes buyButtonClick {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.systemproduct-button.clicked {
+  animation: buyButtonClick 0.3s ease-in-out;
+  background: linear-gradient(90deg, #ffb400 60%, #ff8001 100%);
+}
+
+/* Hover effect for product card */
+.systemproduct-card {
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.systemproduct-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Click effect for product card */
+.systemproduct-card:active {
+  transform: translateY(-2px);
+}

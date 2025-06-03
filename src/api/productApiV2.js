@@ -118,13 +118,15 @@ export async function fetchAllCategories() {
 }
 
 /**
- * Отримати категорію за назвою
- * @param {string} categoryName - Назва категорії
+ * Отримати категорію за id
+ * @param {string} categoryId - ID категорії
  * @returns {Promise<Object>} Категорія
  */
-// export async function fetchCategoryById(categoryName) {
-//   // Не використовуй цю функцію, використовуй fetchCategoryByName
-// }
+export async function fetchCategoryById(categoryId) {
+  const res = await fetch(`${API_BASE_URL}/api/products/categories/${categoryId}`);
+  if (!res.ok) throw new Error('Не вдалося отримати категорію');
+  return res.json();
+}
 
 /**
  * Отримати атрибути категорії
@@ -306,8 +308,44 @@ export async function filterProducts(params = {}) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(params),
   });
-  console.log(111111111111111111111111);
-  console.log(params);
+
   if (!res.ok) throw new Error('Не вдалося відфільтрувати товари');
   return res.json();
 } 
+
+
+// Get category name
+
+export async function getProductCategoryInfo(productId) {
+  try {
+    // Отримуємо інформацію про продукт
+    const productRes = await fetch(`${API_BASE_URL}/api/products/${productId}`);
+    if (!productRes.ok) throw new Error('Не вдалося отримати інформацію про товар');
+    const productData = await productRes.json();
+
+    if (!productData.categories || !Array.isArray(productData.categories)) {
+      throw new Error('Некоректні дані категорій товару');
+    }
+
+    // Отримуємо інформацію про всі категорії продукту
+    const categoryPromises = productData.categories.map(async (category) => {
+      const categoryRes = await fetch(`${API_BASE_URL}/api/products/categories/${category}`);
+      if (!categoryRes.ok) return null;
+      return await categoryRes.json();
+    });
+
+    const categories = await Promise.all(categoryPromises);
+
+    // Шукаємо категорію, яка не є "Компоненти"
+    const targetCategory = categories.find(cat => cat && cat.name && cat.name !== 'Компоненти');
+
+    if (!targetCategory) {
+      throw new Error('Не знайдено відповідну категорію');
+    }
+    console.log('targetCategory', targetCategory.name);
+    return targetCategory.name;
+  } catch (error) {
+    console.error('Помилка в getProductCategoryInfo:', error);
+    throw error;
+  }
+}
