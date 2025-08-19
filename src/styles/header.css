@@ -1,0 +1,150 @@
+@import url('https://fonts.googleapis.com/css2?family=Bruno+Ace+SC&display=swap');
+
+.Header  {
+  padding-left: 139px;
+}
+.header_line {
+  padding-top: 48px;
+  display: flex;
+  align-items: center;
+  font-family: 'Tektur', sans-serif;
+  color: #ffffff;
+  font-size: 30px;
+}
+
+.button {
+  display: flex;
+  align-items: center;
+  gap: 27px;
+}
+
+.button img {
+  transition: transform 0.2s ease; /* Плавний перехід */
+}
+
+.button img:hover {
+  transform: scale(1.1); /* Збільшення на 10% */
+}
+
+
+.Logo_name {
+  color: #FF8001;
+  font-size: 55px;
+  font-family: 'Bruno Ace SC', sans-serif;
+  margin-right: 55px;
+}
+
+.header_logo {
+  margin-right: 20px;
+}
+
+.adresa {
+  margin-right: 27px;
+}
+
+.Street {
+  padding-right: 27px;
+  padding-left: 27px;
+}
+
+.image-container {
+  position: relative; 
+  display: inline-block; 
+}
+
+.background-image {
+  width: 100%; 
+  height: auto; 
+}
+
+.overlay-text {
+  position: absolute; 
+  top: 50%; 
+  left: 50%; 
+  transform: translate(-50%, -50%); 
+  font-size: 25px; 
+  font-weight: 400; 
+  color: #000000; 
+  text-align: center; 
+  white-space: nowrap; 
+}
+
+/* ====== Адаптивність для планшетів ====== */
+@media (max-width: 1024px) {
+  .Header {
+    padding-left: 30px;
+    padding-right: 30px;
+  }
+  .header_line {
+    flex-wrap: wrap;
+    font-size: 22px;
+    padding-top: 24px;
+    gap: 10px;
+  }
+  .Logo_name {
+    font-size: 36px;
+    margin-right: 20px;
+  }
+  .adresa, .Street {
+    font-size: 18px;
+    margin-right: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  .image-container {
+    max-width: 120px;
+  }
+  .overlay-text {
+    font-size: 16px;
+  }
+  .button {
+    gap: 12px;
+  }
+}
+
+/* ====== Адаптивність для мобільних пристроїв ====== */
+@media (max-width: 600px) {
+  .Header {
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+  .header_line {
+    flex-direction: column;
+    align-items: flex-start;
+    font-size: 16px;
+    padding-top: 10px;
+    gap: 6px;
+  }
+  .header_logo img {
+    width: 40px;
+    height: 40px;
+  }
+  .Logo_name {
+    font-size: 24px;
+    margin-right: 0;
+  }
+  .adresa, .Street {
+    font-size: 14px;
+    margin-right: 0;
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .image-container {
+    max-width: 80px;
+  }
+  .background-image {
+    width: 100%;
+    height: auto;
+  }
+  .overlay-text {
+    font-size: 10px;
+  }
+  .button {
+    gap: 6px;
+  }
+  .button img {
+    width: 28px;
+    height: 28px;
+  }
+}
+
